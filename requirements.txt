@@ -1,0 +1,14 @@
+Flask==0.10.1
+Jinja2==2.7.1
+MarkupSafe==0.18
+SQLAlchemy==0.8.2
+Werkzeug==0.9.4
+cov-core==1.7
+coverage==3.6
+itsdangerous==0.23
+py==1.4.15
+pytest==2.3.5
+pytest-cov==1.6
+tornado==3.1.1
+tox==1.6.1
+virtualenv==1.10.1

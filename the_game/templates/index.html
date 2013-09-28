@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <script type="text/javascript">
+            var turn = 0;
+            var board = [];
+            var winnings = [[0,1,2],[3,4,5],[6,7,8],
+                            [0,3,6],[1,4,7],[2,5,8],
+                            [0,4,8],[2,4,6]];
+
+            function checkWinnings(player) {
+                for(var i=0; i<winnings.length; i++) {
+                    if(board[winnings[i][0]]==player &&
+                       board[winnings[i][1]]==player &&
+                       board[winnings[i][2]]==player) {
+                        var oneBasedPlayer = (player+1);
+                        alert("Player "+oneBasedPlayer+" wins!");
+                        resetGame();
+                    }
+                }
+            }
+
+            function positionPlayed(id) { return board[id] != null; }
+
+            function canvasClicked(id) {
+                if(positionPlayed(id))
+                    return;
+
+                player = (turn % 2);
+                color = (player==0 ? "red" : "blue");
+                getTile(id).style.backgroundColor = color;
+                board[id] = player;
+                checkWinnings(player);
+                turn++;
+
+                console.log(turn);
+                if(turn >= 9) {
+                    alert("Game over!");
+                    resetGame();
+                }
+            }
+
+            function getTile(id) { return document.getElementById("c"+id); }
+
+            function resetGame() {
+                board = [];
+                turn = 0;
+                for(var i=0; i<9; i++) {
+                    getTile(i).style.backgroundColor = "lightgrey";
+                }
+            }
+        </script>
+        <style>
+            canvas { background-color: lightgray; }
+            #board { width: 300px; margin: 70px auto; }
+        </style>
+    </head>
+    <body>
+        <div id="board">
+            <canvas id="c0" width="70" height="70" onClick="canvasClicked(0)"></canvas>
+            <canvas id="c1" width="70" height="70" onClick="canvasClicked(1)"></canvas>
+            <canvas id="c2" width="70" height="70" onClick="canvasClicked(2)"></canvas>
+            <br>
+            <canvas id="c3" width="70" height="70" onClick="canvasClicked(3)"></canvas>
+            <canvas id="c4" width="70" height="70" onClick="canvasClicked(4)"></canvas>
+            <canvas id="c5" width="70" height="70" onClick="canvasClicked(5)"></canvas>
+            <br>
+            <canvas id="c6" width="70" height="70" onClick="canvasClicked(6)"></canvas>
+            <canvas id="c7" width="70" height="70" onClick="canvasClicked(7)"></canvas>
+            <canvas id="c8" width="70" height="70" onClick="canvasClicked(8)"></canvas>
+        </div>
+    </body>
+</html>
