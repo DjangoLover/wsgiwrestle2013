@@ -29,11 +29,11 @@ setup(
         'the_game',
     ],
     package_dir={'the_game': 'the_game'},
-#    entry_points={
-#        'console_scripts':[
-#            'the_game = the_game.main:start',
-#        ],
-#    },
+    entry_points={
+        'console_scripts':[
+            'the-game = the_game.main:start',
+        ],
+    },
     include_package_data=True,
     install_requires=[
     ],
