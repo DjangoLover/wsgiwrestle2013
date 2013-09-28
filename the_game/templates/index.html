@@ -1,12 +1,14 @@
 <!DOCTYPE html>
 <html>
     <head>
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
         <script type="text/javascript">
-            var turn = 0;
-            var board = [];
-            var winnings = [[0,1,2],[3,4,5],[6,7,8],
-                            [0,3,6],[1,4,7],[2,5,8],
-                            [0,4,8],[2,4,6]];
+            $.post("{{ url_for('tic_tac_toe') }}",
+                    function(data){
+                        //document.write(data);
+                        console.log(data);
+                    }); 
+
 
             function checkWinnings(player) {
                 for(var i=0; i<winnings.length; i++) {
@@ -22,32 +24,46 @@
 
             function positionPlayed(id) { return board[id] != null; }
 
-            function canvasClicked(id) {
-                if(positionPlayed(id))
-                    return;
-
-                player = (turn % 2);
-                color = (player==0 ? "red" : "blue");
-                getTile(id).style.backgroundColor = color;
-                board[id] = player;
-                checkWinnings(player);
-                turn++;
-
-                console.log(turn);
-                if(turn >= 9) {
-                    alert("Game over!");
-                    resetGame();
-                }
+            function canvasClicked(row, col) {
+                $.post("{{ url_for('tic_tac_toe') }}", {row: row, col: col});
             }
 
+            function checkGame(){
+                $.get("{{ url_for('tic_tac_toe', game=True) }}", 
+                      function(data){
+                          for(var row = 0; row < data.board.length; row++){
+                              for(var col = 0; col < data.board[row].length; col++){
+                                  var color = 'lightgrey';
+                                  if (data.board[row][col] == 'X') {
+                                      color = 'red';
+                                  }
+                                  else if (data.board[row][col] == 'Y') {
+                                      color = 'blue';
+                                      }
+                                  if (getTile(row.toString() + col.toString()) == null){
+                                    console.log('Whoops');
+                                    console.log('c'+row.toString()+col.toString());
+                                  }
+
+                                  getTile(row.toString() + col.toString()).style.backgroundColor = color;
+                              }
+                          }
+                      });
+                setTimeout('checkGame()', 500);
+            }
+
+            checkGame();
             function getTile(id) { return document.getElementById("c"+id); }
 
             function resetGame() {
+                $.post("{{ url_for('tic_tac_toe', game='reset') }}");
+                /*
                 board = [];
                 turn = 0;
                 for(var i=0; i<9; i++) {
                     getTile(i).style.backgroundColor = "lightgrey";
                 }
+                */
             }
         </script>
         <style>
@@ -56,18 +72,19 @@
         </style>
     </head>
     <body>
+        <input type="submit" value="Reset Game" onclick="resetGame();" />
         <div id="board">
-            <canvas id="c0" width="70" height="70" onClick="canvasClicked(0)"></canvas>
-            <canvas id="c1" width="70" height="70" onClick="canvasClicked(1)"></canvas>
-            <canvas id="c2" width="70" height="70" onClick="canvasClicked(2)"></canvas>
+            <canvas id="c00" width="70" height="70" onClick="canvasClicked(0,0);"></canvas>
+            <canvas id="c01" width="70" height="70" onClick="canvasClicked(0,1);"></canvas>
+            <canvas id="c02" width="70" height="70" onClick="canvasClicked(0,2);"></canvas>
             <br>
-            <canvas id="c3" width="70" height="70" onClick="canvasClicked(3)"></canvas>
-            <canvas id="c4" width="70" height="70" onClick="canvasClicked(4)"></canvas>
-            <canvas id="c5" width="70" height="70" onClick="canvasClicked(5)"></canvas>
+            <canvas id="c10" width="70" height="70" onClick="canvasClicked(1,0);"></canvas>
+            <canvas id="c11" width="70" height="70" onClick="canvasClicked(1,1);"></canvas>
+            <canvas id="c12" width="70" height="70" onClick="canvasClicked(1,2);"></canvas>
             <br>
-            <canvas id="c6" width="70" height="70" onClick="canvasClicked(6)"></canvas>
-            <canvas id="c7" width="70" height="70" onClick="canvasClicked(7)"></canvas>
-            <canvas id="c8" width="70" height="70" onClick="canvasClicked(8)"></canvas>
+            <canvas id="c20" width="70" height="70" onClick="canvasClicked(2,0);"></canvas>
+            <canvas id="c21" width="70" height="70" onClick="canvasClicked(2,1);"></canvas>
+            <canvas id="c22" width="70" height="70" onClick="canvasClicked(2,2);"></canvas>
         </div>
     </body>
 </html>
