@@ -63,6 +63,7 @@ get("/games/tic-tac-toe")
     ]
 }
 
+post('/games/<the_game>/start') # assuming valid cookie info
 post('/games/tic-tac-toe/start') # assuming valid cookie info
 
     {

@@ -1,21 +1,5 @@
 from the_game import exceptions as exc
-
-class Game:
-    min_players = 0
-    max_players = 0
-    name = "The Game"
-    link = "the-game"
-    id = None
-    players = None
-
-
-    def add_player(self, player):
-        if len(players) < max_players:
-            raise exc.GameFullError("Game already has {} players!".format(
-                                        len(players)))
-        else:
-            players.add(player)
-
+from the_game import server
 
 class Player:
 
@@ -27,16 +11,29 @@ class Player:
             return False
 
 
+def test(foo):
+    return 'tic-tac-toe'
 
-class TicTacToe(Game):
+class TicTacToe:
     def __init__(self):
-        self.name = 'Tic Tac Toe'
-        self.link = 'tic-tac-toe'
+        self.game = server.Game('tic-tac-toe')
 
 
     def __repr__(self):
         return self.name
 
 
+    @test
+    def name(self):
+        return 'Tic Tac Toe'
+
+
+    @test
+    def link(self):
+        return 'tic-tac-toe'
+
+
 game_list = [TicTacToe()]
 games = {game.link:game for game in game_list}
+
+server.register_game(TicTacToe)

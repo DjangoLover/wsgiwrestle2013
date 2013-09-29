@@ -1,7 +1,8 @@
 import os
 import logging
-from the_game import games as the_games
-from flask import Flask, render_template, jsonify, request
+from the_game import server, games as the_games
+from flask import Flask, make_response, render_template, request, jsonify,\
+                  render_template
 
 app = Flask(__name__)
 app.config['TEAM'] = 'X'
@@ -9,15 +10,33 @@ app.config['BOARD'] = [['X', None, None],
                        [None, 'X', None],
                        [None, None, 'X']]
 
+def current_user():
+    '''Get and return the current user from their cookie.'''
+    user_id = request.cookies.get('user_id')
+    user = server.get_user(user_id)
+    if user is None:
+        user = server.new_user()
+    return user
+
+
 @app.route("/")
 def main():
-    return render_template('index.html')
+    user = current_user()
+    resp =  make_response(render_template('index.html', user = user))
+    resp.set_cookie('user_id', user.id)
+    return resp
 
 
 @app.route("/games", defaults={'game': None})
 @app.route("/games/<game>")
 def games(game):
     return render_template('game_list.html', games=the_games.games)
+
+
+@app.route("/games/<game>/start", methods=['GET', 'POST'])
+def start_game(game):
+    server.start_game(game, current_user().id)
+    return jsonify(thing=game)
 
 
 @app.route('/tic-tac-toe', methods=['GET', 'POST'], defaults={'game':None})
