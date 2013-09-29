@@ -113,3 +113,10 @@ def register_game(game):
     logging.warning(game)
     games[game.link] = game
     logging.warn('Games %s', games)
+
+
+def get_game(game_id):
+    game = session.query(Game).filter_by(id=game_id).one()
+    game_ = games[game.name]()
+    game_.game = game
+    return game_

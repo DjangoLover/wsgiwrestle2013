@@ -1,4 +1,5 @@
 import os
+import json
 import logging
 from the_game import server, games as the_games
 from flask import Flask, make_response, render_template, request, jsonify,\
@@ -41,7 +42,21 @@ def start_game(game):
 
 @app.route("/games/<game>/<game_id>", methods=['GET', 'POST'])
 def game_stuff(game, game_id):
-    return jsonify(game=game, game_id=game_id)
+    game = server.get_game(game_id)
+    if request.method == 'POST':
+        game.take_turn(request.form.get('move'))
+    game = game.game
+    players = [p.user.id for p in game.participants]
+    teams = [p.team for p in game.participants]
+    teams = list(set(teams))
+    status = game.status
+    current_turn = game.current_turn
+    return jsonify(game_state=json.loads(game.game_state),
+                   status=status,
+                   players=players,
+                   teams=teams,
+                   current_turn=current_turn,
+                   game_id=game_id)
 
 
 @app.route('/tic-tac-toe', methods=['GET', 'POST'], defaults={'game':None})

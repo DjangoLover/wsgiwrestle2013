@@ -1,3 +1,4 @@
+import json
 from the_game import exceptions as exc
 from the_game import server
 
@@ -21,6 +22,12 @@ class TicTacToe:
 
     def __repr__(self):
         return self.name
+
+
+    def take_turn(self, move):
+        self.game.game_state = json.dumps([move])
+        server.session.add(self.game)
+        server.session.commit()
 
 
     @test
