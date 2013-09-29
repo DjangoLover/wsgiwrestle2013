@@ -39,6 +39,11 @@ def start_game(game):
     return jsonify(thing=game)
 
 
+@app.route("/games/<game>/<game_id>", methods=['GET', 'POST'])
+def game_stuff(game, game_id):
+    return jsonify(game=game, game_id=game_id)
+
+
 @app.route('/tic-tac-toe', methods=['GET', 'POST'], defaults={'game':None})
 @app.route('/tic-tac-toe/<game>', methods=['GET', 'POST'])
 def tic_tac_toe(game):
