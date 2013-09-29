@@ -25,7 +25,7 @@ class Particpation(Base):
 
     id = Column(Integer, primary_key=True)
     game_id = Column(Integer, ForeignKey('games.id'))
-    user_id = Column(String, ForeignKey('users.id'))
+    user_id = Column(String, ForeignKey('users.id'), nullable = True)
     team = Column(String)
     user = relationship(User, backref='my_games')
     game = relationship('Game', backref='participants')
@@ -97,11 +97,18 @@ def get_user(id):
 def start_game(game, user_id):
     try:
         game = games[game]()
+        game.current_turn = user_id
     except KeyError:
         raise ValueError("No game {} registered.".format(game))
     session.add(game.game)
     session.commit()
     p = Particpation()
+    p.team = 'O' #horrible hack :P
+    p.user_id = user_id
+    p.game_id = game.game.id
+    session.add(p)
+    p = Particpation()
+    p.team = 'X' #horrible hack :P
     p.user_id = user_id
     p.game_id = game.game.id
     session.add(p)

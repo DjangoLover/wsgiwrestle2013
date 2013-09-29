@@ -1,4 +1,5 @@
 import json
+import logging
 from the_game import exceptions as exc
 from the_game import server
 
@@ -18,14 +19,35 @@ def test(foo):
 class TicTacToe:
     def __init__(self):
         self.game = server.Game('tic-tac-toe')
+        self.game.game_state = json.dumps(self._clean_board())
 
 
     def __repr__(self):
         return self.name
 
 
+    def _get_current_team(self):
+        for p in self.game.participants:
+            if p.user_id == self.game.current_turn:
+                return p.team
+
+
+    def _clean_board(self):
+        return [[None, None, None],
+                [None, None, None],
+                [None, None, None]]
+        
+                
     def take_turn(self, move):
-        self.game.game_state = json.dumps([move])
+        team = self._get_current_team()
+        board = json.loads(self.game.game_state)
+        if board is None:
+            board = self._clean_board()
+        logging.warn(team)
+        board[move['row']][move['col']] = team
+        logging.warn(board)
+        self.current_turn = self.game.participants[0].user_id
+        self.game.game_state = json.dumps(board)
         server.session.add(self.game)
         server.session.commit()
 
