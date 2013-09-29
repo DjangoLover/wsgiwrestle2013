@@ -35,8 +35,8 @@ def games(game):
 
 @app.route("/games/<game>/start", methods=['GET', 'POST'])
 def start_game(game):
-    server.start_game(game, current_user().id)
-    return jsonify(thing=game)
+    game = server.start_game(game, current_user().id)
+    return jsonify(game_id=game.id)
 
 
 @app.route("/games/<game>/<game_id>", methods=['GET', 'POST'])

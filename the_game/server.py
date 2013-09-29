@@ -106,6 +106,7 @@ def start_game(game, user_id):
     p.game_id = game.game.id
     session.add(p)
     session.commit()
+    return game.game
 
 
 def register_game(game):

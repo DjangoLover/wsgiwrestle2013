@@ -1,5 +1,6 @@
 import pytest
 import flask
+import json
 from sqlalchemy import create_engine
 from the_game import main, games as the_games, server
 
@@ -64,3 +65,17 @@ def test_playing_a_game_should_work(test_client, new_db):
     pytest.skip()
 
     rv = test_client.post('/games/tic-tac-toe/start')
+
+
+def test_game_start_should_return_game_id(test_client, new_db):
+    rv = test_client.post('/games/tic-tac-toe/start')
+    data = json.loads(rv.data.decode())
+    assert data['game_id'] == 1
+
+
+def test_start_game_should_return_game(new_db):
+    user = server.new_user()
+    game = server.start_game('tic-tac-toe', user.id)
+
+    assert game is not None
+    assert game.id == 1
