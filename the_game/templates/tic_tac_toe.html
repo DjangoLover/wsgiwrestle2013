@@ -1,1 +1,82 @@
-Hi mom!
+<!DOCTYPE html>
+<html>
+    <head>
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+        <script type="text/javascript">
+            var game_id;
+
+            $.get("{{ url_for('game_stuff', game = game.game.name, game_id = game.game.id) }}",
+                function(data){
+                    updateBoard(data.game_state);
+                }); 
+
+            function canvasClicked(row, col) {
+                $.post("{{ url_for('game_stuff', game = game.game.name, game_id = game.game.id) }}",
+                        { move: {row: row, col: col} });
+            }
+
+            function updateBoard(gameState) {
+                for(var row = 0; row < gameState.length; row++){
+                    for(var col = 0; col < gameState[row].length; col++){
+                        var color = 'lightgrey';
+                        if (gameState[row][col] == 'X') {
+                            color = 'red';
+                        }
+                        else if (gameState[row][col] == 'Y') {
+                            color = 'blue';
+                            }
+                        if (getTile(row.toString() + col.toString()) == null){
+                          console.log('Whoops');
+                          console.log('c'+row.toString()+col.toString());
+                        }
+
+                        getTile(row.toString() + col.toString()).style.backgroundColor = color;
+                    }
+                }
+            }
+
+            function checkGame(){
+                $.get("{{ url_for('game_stuff', game = game.game.name, game_id = game.game.id) }}", 
+                    function(data){
+                        updateBoard(data);
+                    });
+                setTimeout('checkGame()', 500);
+            }
+
+            checkGame();
+            function getTile(id) { return document.getElementById("c"+id); }
+
+            function resetGame() {
+                $.post("{{ url_for('tic_tac_toe', game='reset') }}");
+                /*
+                board = [];
+                turn = 0;
+                for(var i=0; i<9; i++) {
+                    getTile(i).style.backgroundColor = "lightgrey";
+                }
+                */
+            }
+        </script>
+        <style>
+            canvas { background-color: lightgray; }
+            #board { width: 300px; margin: 70px auto; }
+        </style>
+    </head>
+    <body>
+        Ready {{ user.id }}
+        <input type="submit" value="Reset Game" onclick="resetGame();" />
+        <div id="board">
+            <canvas id="c00" width="70" height="70" onClick="canvasClicked(0,0);"></canvas>
+            <canvas id="c01" width="70" height="70" onClick="canvasClicked(0,1);"></canvas>
+            <canvas id="c02" width="70" height="70" onClick="canvasClicked(0,2);"></canvas>
+            <br>
+            <canvas id="c10" width="70" height="70" onClick="canvasClicked(1,0);"></canvas>
+            <canvas id="c11" width="70" height="70" onClick="canvasClicked(1,1);"></canvas>
+            <canvas id="c12" width="70" height="70" onClick="canvasClicked(1,2);"></canvas>
+            <br>
+            <canvas id="c20" width="70" height="70" onClick="canvasClicked(2,0);"></canvas>
+            <canvas id="c21" width="70" height="70" onClick="canvasClicked(2,1);"></canvas>
+            <canvas id="c22" width="70" height="70" onClick="canvasClicked(2,2);"></canvas>
+        </div>
+    </body>
+</html>

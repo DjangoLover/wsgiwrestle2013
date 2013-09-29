@@ -1,10 +1,12 @@
+import logging
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import create_engine, event
-from sqlalchemy import Column, String
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy import Column, String, Integer, ForeignKey
+from sqlalchemy.orm import sessionmaker, relationship
 from sqlalchemy.exc import IntegrityError
 
 Base = declarative_base()
+games = {}
 
 class User(Base):
     __tablename__ = 'users'
@@ -17,6 +19,35 @@ class User(Base):
     def __repr__(self):
         return self.id
     
+
+class Particpation(Base):
+    __tablename__ = 'participations'
+
+    id = Column(Integer, primary_key=True)
+    game_id = Column(Integer, ForeignKey('games.id'))
+    user_id = Column(String, ForeignKey('users.id'), nullable = True)
+    team = Column(String)
+    user = relationship(User, backref='my_games')
+    game = relationship('Game', backref='participants')
+
+
+class Game(Base):
+    __tablename__ = 'games'
+
+    id = Column(Integer, primary_key=True)
+    name = Column(String)
+    status = Column(String)
+    winning_team = Column(String, nullable=True)
+    current_turn = Column(String, ForeignKey('users.id'), nullable=True)
+    game_state = Column(String)
+
+
+    def __init__(self, name):
+        self.name = name
+        self.status = 'waiting'
+        self.game_state = 'null'
+
+
 
 def _fk_pragma_on_connect(dbapi_con, con_record):
     try:
@@ -62,3 +93,37 @@ def update_user(id, new_id):
 def get_user(id):
     return session.query(User).filter_by(id=id).first()
 
+
+def start_game(game, user_id):
+    try:
+        game = games[game]()
+        game.current_turn = user_id
+    except KeyError:
+        raise ValueError("No game {} registered.".format(game))
+    session.add(game.game)
+    session.commit()
+    p = Particpation()
+    p.team = 'O' #horrible hack :P
+    p.user_id = user_id
+    p.game_id = game.game.id
+    session.add(p)
+    p = Particpation()
+    p.team = 'X' #horrible hack :P
+    p.user_id = user_id
+    p.game_id = game.game.id
+    session.add(p)
+    session.commit()
+    return game.game
+
+
+def register_game(game):
+    logging.warning(game)
+    games[game.link] = game
+    logging.warn('Games %s', games)
+
+
+def get_game(game_id):
+    game = session.query(Game).filter_by(id=game_id).one()
+    game_ = games[game.name]()
+    game_.game = game
+    return game_
